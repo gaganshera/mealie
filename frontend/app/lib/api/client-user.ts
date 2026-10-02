@@ -14,6 +14,7 @@ import { GroupRecipeActionsAPI } from "./user/group-recipe-actions";
 import { WebhooksAPI } from "./user/group-webhooks";
 import { RegisterAPI } from "./user/user-registration";
 import { MealPlanAPI } from "./user/group-mealplan";
+import { HouseholdCalendarFeedAPI } from "./user/household-calendar-feed";
 import { EmailAPI } from "./user/email";
 import { BulkActionsAPI } from "./user/recipe-bulk-actions";
 import { ToolsApi } from "./user/organizer-tools";
@@ -43,6 +44,7 @@ export class UserApiClient {
   public groupWebhooks: WebhooksAPI;
   public register: RegisterAPI;
   public mealplans: MealPlanAPI;
+  public calendarFeed: HouseholdCalendarFeedAPI;
   public mealplanRules: MealPlanRulesApi;
   public email: EmailAPI;
   public bulk: BulkActionsAPI;
@@ -74,6 +76,7 @@ export class UserApiClient {
     this.groupWebhooks = new WebhooksAPI(requests);
     this.register = new RegisterAPI(requests);
     this.mealplans = new MealPlanAPI(requests);
+    this.calendarFeed = new HouseholdCalendarFeedAPI(requests);
     this.mealplanRules = new MealPlanRulesApi(requests);
 
     // Group
