@@ -16,8 +16,10 @@
   <RecipeImageLightbox
     v-if="lightboxOpen"
     v-model="lightboxOpen"
+    v-model:index="lightboxIndex"
     :image-url="recipeFullImageUrl"
     :image-alt="recipe.name"
+    :images="lightboxImages"
   />
 </template>
 
@@ -25,6 +27,8 @@
 import { useStaticRoutes, useUserApi } from "~/composables/api";
 import type { HouseholdSummary } from "~/lib/api/types/household";
 import { usePageState, usePageUser } from "~/composables/recipe-page/shared-state";
+import { useRecipeGallery } from "~/composables/recipes/use-recipe-gallery";
+import { useLoggedInState } from "~/composables/use-logged-in-state";
 import type { Recipe } from "~/lib/api/types/recipe";
 import type { NoUndefinedField } from "~/lib/api/types/non-generated";
 
@@ -51,11 +55,22 @@ if (user) {
 
 const hideImage = ref(false);
 const lightboxOpen = ref(false);
+const lightboxIndex = ref(0);
+
+// The gallery is only available to members of the recipe's group
+const { isOwnGroup } = useLoggedInState();
+const gallery = isOwnGroup.value ? useRecipeGallery(props.recipe.id, props.recipe.slug) : null;
+gallery?.load();
+
+const lightboxImages = computed(() =>
+  gallery ? gallery.lightboxImages(recipeFullImageUrl.value, props.recipe.name) : [],
+);
 
 function openLightbox() {
   if (hideImage.value) {
     return;
   }
+  lightboxIndex.value = 0;
   lightboxOpen.value = true;
 }
 

@@ -32,6 +32,7 @@
           @delete="deleteRecipe"
           @close="closeEditor"
         />
+        <RecipeGallery v-if="isOwnGroup && !isEditJSON" v-model="recipe" />
         <RecipeJsonEditor
           v-if="isEditJSON"
           v-model="recipe"
@@ -223,6 +224,7 @@
 import type { ComponentPublicInstance } from "vue";
 import { invoke, until } from "@vueuse/core";
 import type { RouteLocationNormalized } from "vue-router";
+import RecipeGallery from "../RecipeGallery.vue";
 import RecipeIngredients from "../RecipeIngredients.vue";
 import RecipePageEditorToolbar from "./RecipePageParts/RecipePageEditorToolbar.vue";
 import RecipePageFooter from "./RecipePageParts/RecipePageFooter.vue";

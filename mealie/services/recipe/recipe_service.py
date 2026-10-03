@@ -38,6 +38,7 @@ from mealie.services._base_service import BaseService
 from mealie.services.household_services.household_service import HouseholdService
 from mealie.services.parser_services._base import DataMatcher
 from mealie.services.recipe.recipe_data_service import RecipeDataService
+from mealie.services.recipe.recipe_gallery_service import RecipeGalleryService
 
 from .template_service import TemplateService
 
@@ -514,6 +515,12 @@ class RecipeService(RecipeServiceBase):
             )
         except Exception as e:
             self.logger.error(f"Failed to copy assets from {old_recipe.slug} to {new_recipe.slug}: {e}")
+
+        # The copied folder holds the gallery files under the old image ids, so give the copy its own rows and ids
+        try:
+            RecipeGalleryService.duplicate(self.repos, old_recipe.id, new_recipe)
+        except Exception as e:
+            self.logger.error(f"Failed to copy gallery images from {old_recipe.slug} to {new_recipe.slug}: {e}")
 
         return new_recipe
 
