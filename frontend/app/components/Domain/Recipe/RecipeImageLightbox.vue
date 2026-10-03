@@ -12,9 +12,10 @@
     >
       <div ref="frameRef" class="lightbox-frame">
         <img
-          v-if="imageUrl"
-          :src="imageUrl"
-          :alt="imageAlt"
+          v-if="currentImage"
+          :key="currentImage.url"
+          :src="currentImage.url"
+          :alt="currentImage.alt"
           class="lightbox-img"
           draggable="false"
           :style="imgStyle"
@@ -25,6 +26,42 @@
           @pointerup="onPointerUp"
           @pointercancel="onPointerUp"
         >
+      </div>
+      <template v-if="slides.length > 1">
+        <v-btn
+          icon
+          variant="text"
+          class="lightbox-nav lightbox-prev"
+          data-testid="lightbox-prev"
+          :disabled="!hasPrev"
+          :aria-label="$t('general.previous')"
+          @click.stop="prev"
+        >
+          <v-icon>{{ $globals.icons.chevronLeft }}</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          variant="text"
+          class="lightbox-nav lightbox-next"
+          data-testid="lightbox-next"
+          :disabled="!hasNext"
+          :aria-label="$t('general.next')"
+          @click.stop="next"
+        >
+          <v-icon>{{ $globals.icons.chevronRight }}</v-icon>
+        </v-btn>
+      </template>
+      <div
+        v-if="slides.length > 1 || currentImage?.caption"
+        class="lightbox-footer"
+        @click.stop
+      >
+        <div v-if="currentImage?.caption" class="lightbox-caption" data-testid="lightbox-caption">
+          {{ currentImage.caption }}
+        </div>
+        <div v-if="slides.length > 1" class="lightbox-counter" data-testid="lightbox-counter">
+          {{ currentIndex + 1 }} / {{ slides.length }}
+        </div>
       </div>
       <v-btn
         icon
@@ -42,13 +79,58 @@
 <script setup lang="ts">
 import { useTheme } from "vuetify";
 
+export interface LightboxImage {
+  url: string;
+  alt?: string;
+  caption?: string | null;
+}
+
 interface Props {
   imageUrl?: string;
   imageAlt?: string;
+  images?: LightboxImage[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const model = defineModel<boolean>({ required: true });
+const index = defineModel<number>("index", { default: 0 });
+
+// `images` enables browsing; a single `imageUrl` keeps working on its own
+const slides = computed<LightboxImage[]>(() => {
+  if (props.images?.length) {
+    return props.images;
+  }
+  return props.imageUrl ? [{ url: props.imageUrl, alt: props.imageAlt }] : [];
+});
+
+const currentIndex = computed(() => Math.min(Math.max(index.value, 0), Math.max(slides.value.length - 1, 0)));
+const currentImage = computed(() => slides.value[currentIndex.value]);
+const hasPrev = computed(() => currentIndex.value > 0);
+const hasNext = computed(() => currentIndex.value < slides.value.length - 1);
+
+function prev() {
+  if (hasPrev.value) {
+    index.value = currentIndex.value - 1;
+  }
+}
+
+function next() {
+  if (hasNext.value) {
+    index.value = currentIndex.value + 1;
+  }
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (!model.value) {
+    return;
+  }
+  if (event.key === "ArrowLeft") {
+    prev();
+  }
+  else if (event.key === "ArrowRight") {
+    next();
+  }
+}
 
 const theme = useTheme();
 const isDark = computed(() => theme.global.current.value.dark);
@@ -87,10 +169,12 @@ function onImageLoad(event: Event) {
 onMounted(() => {
   updateFrameSize();
   window.addEventListener("resize", updateFrameSize);
+  window.addEventListener("keydown", onKeydown);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateFrameSize);
+  window.removeEventListener("keydown", onKeydown);
 });
 
 const renderedSize = computed(() => {
@@ -136,6 +220,15 @@ watch(model, (open) => {
   }
 });
 
+watch(currentIndex, () => {
+  resetZoom();
+  naturalSize.w = 0;
+  naturalSize.h = 0;
+});
+
+const SWIPE_THRESHOLD = 50;
+let swipeStartX: number | null = null;
+
 function onBackgroundClick() {
   model.value = false;
 }
@@ -157,6 +250,7 @@ function onImageClick(event: MouseEvent) {
 function onPointerDown(event: PointerEvent) {
   event.stopPropagation();
   if (!zoomed.value) {
+    swipeStartX = event.clientX;
     return;
   }
   dragging.value = true;
@@ -180,6 +274,21 @@ function onPointerMove(event: PointerEvent) {
 function onPointerUp(event: PointerEvent) {
   event.stopPropagation();
   dragging.value = false;
+
+  if (swipeStartX !== null) {
+    const dx = event.clientX - swipeStartX;
+    swipeStartX = null;
+    if (Math.abs(dx) > SWIPE_THRESHOLD) {
+      // Keep the click that follows the swipe from toggling zoom
+      dragMoved.value = true;
+      if (dx > 0) {
+        prev();
+      }
+      else {
+        next();
+      }
+    }
+  }
 }
 
 const imgStyle = computed(() => ({
@@ -210,6 +319,39 @@ const imgStyle = computed(() => ({
   position: absolute;
   top: 12px;
   right: 12px;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-prev {
+  left: 12px;
+}
+
+.lightbox-next {
+  right: 12px;
+}
+
+.lightbox-footer {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80vw;
+  text-align: center;
+  cursor: default;
+}
+
+.lightbox-caption {
+  font-size: 1rem;
+}
+
+.lightbox-counter {
+  font-size: 0.875rem;
+  opacity: 0.8;
 }
 
 .lightbox-frame {

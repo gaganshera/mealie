@@ -177,7 +177,8 @@
     "date-updated": "Date Updated",
     "key": "Key",
     "value": "Value",
-    "cant-create-permission": "Can't create. Please contact your administrator to get permission."
+    "cant-create-permission": "Can't create. Please contact your administrator to get permission.",
+    "previous": "Previous"
   },
   "group": {
     "create-group": "Create Group",
@@ -644,7 +645,13 @@
     "cover-image": "Cover image",
     "include-linked-recipes": "Include Linked Recipes",
     "include-linked-recipe-ingredients": "Include Linked Recipe Ingredients",
-    "toggle-recipe": "Toggle Recipe"
+    "toggle-recipe": "Toggle Recipe",
+    "gallery": "Gallery",
+    "gallery-add-images": "Add Images",
+    "gallery-caption": "Caption",
+    "gallery-set-as-cover": "Set as Cover",
+    "gallery-cover-updated": "Cover image updated",
+    "gallery-drag-to-reorder": "Drag the photos to reorder them"
   },
   "recipe-finder": {
     "recipe-finder": "Recipe Finder",

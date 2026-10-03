@@ -452,6 +452,11 @@ def media_recipes_recipe_id_images_file_name(recipe_id, file_name):
     return f"{prefix}/media/recipes/{recipe_id}/images/{file_name}"
 
 
+def media_recipes_recipe_id_images_gallery_image_id_file_name(recipe_id, image_id, file_name):
+    """`/api/media/recipes/{recipe_id}/images/gallery/{image_id}/{file_name}`"""
+    return f"{prefix}/media/recipes/{recipe_id}/images/gallery/{image_id}/{file_name}"
+
+
 def media_recipes_recipe_id_images_timeline_timeline_event_id_file_name(recipe_id, timeline_event_id, file_name):
     """`/api/media/recipes/{recipe_id}/images/timeline/{timeline_event_id}/{file_name}`"""
     return f"{prefix}/media/recipes/{recipe_id}/images/timeline/{timeline_event_id}/{file_name}"
@@ -535,6 +540,26 @@ def recipes_slug_duplicate(slug):
 def recipes_slug_exports(slug):
     """`/api/recipes/{slug}/exports`"""
     return f"{prefix}/recipes/{slug}/exports"
+
+
+def recipes_slug_gallery(slug):
+    """`/api/recipes/{slug}/gallery`"""
+    return f"{prefix}/recipes/{slug}/gallery"
+
+
+def recipes_slug_gallery_image_id(slug, image_id):
+    """`/api/recipes/{slug}/gallery/{image_id}`"""
+    return f"{prefix}/recipes/{slug}/gallery/{image_id}"
+
+
+def recipes_slug_gallery_image_id_set_cover(slug, image_id):
+    """`/api/recipes/{slug}/gallery/{image_id}/set-cover`"""
+    return f"{prefix}/recipes/{slug}/gallery/{image_id}/set-cover"
+
+
+def recipes_slug_gallery_order(slug):
+    """`/api/recipes/{slug}/gallery/order`"""
+    return f"{prefix}/recipes/{slug}/gallery/order"
 
 
 def recipes_slug_image(slug):

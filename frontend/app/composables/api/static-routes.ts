@@ -35,6 +35,10 @@ export const useStaticRoutes = () => {
     return `${prefix}/media/recipes/${recipeId}/images/timeline/${timelineEventId}/tiny-original.webp`;
   }
 
+  function recipeGalleryImage(recipeId: string, imageId: string, size: "original" | "min-original" | "tiny-original" = "original") {
+    return `${prefix}/media/recipes/${recipeId}/images/gallery/${imageId}/${size}.webp`;
+  }
+
   function recipeAssetPath(recipeId: string, assetName: string) {
     return `${prefix}/media/recipes/${recipeId}/assets/${assetName}`;
   }
@@ -46,6 +50,7 @@ export const useStaticRoutes = () => {
     recipeTimelineEventImage,
     recipeTimelineEventSmallImage,
     recipeTimelineEventTinyImage,
+    recipeGalleryImage,
     recipeAssetPath,
   };
 };

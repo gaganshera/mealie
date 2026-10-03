@@ -57,6 +57,9 @@
             <RecipePageEditorToolbar v-if="isEditForm" v-model="recipe" />
           </div>
           <div>
+            <RecipeGallery v-if="isOwnGroup" v-model="recipe" :edit="isEditForm" />
+          </div>
+          <div>
             <RecipePageIngredientEditor v-if="isEditForm" v-model="recipe" />
           </div>
           <div>
@@ -223,6 +226,7 @@
 import type { ComponentPublicInstance } from "vue";
 import { invoke, until } from "@vueuse/core";
 import type { RouteLocationNormalized } from "vue-router";
+import RecipeGallery from "../RecipeGallery.vue";
 import RecipeIngredients from "../RecipeIngredients.vue";
 import RecipePageEditorToolbar from "./RecipePageParts/RecipePageEditorToolbar.vue";
 import RecipePageFooter from "./RecipePageParts/RecipePageFooter.vue";

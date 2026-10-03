@@ -22,6 +22,7 @@ from mealie.repos.repository_generic import RepositoryGeneric
 from mealie.schema import mapper
 from mealie.schema.household.household import HouseholdInDB, HouseholdRecipeUpdate
 from mealie.schema.recipe.recipe import CreateRecipe, Recipe, create_recipe_slug
+from mealie.schema.recipe.recipe_gallery import RecipeGalleryImageSave
 from mealie.schema.recipe.recipe_ingredient import (
     CreateIngredientFood,
     CreateIngredientUnit,
@@ -515,7 +516,34 @@ class RecipeService(RecipeServiceBase):
         except Exception as e:
             self.logger.error(f"Failed to copy assets from {old_recipe.slug} to {new_recipe.slug}: {e}")
 
+        self._duplicate_gallery(old_recipe, new_recipe)
         return new_recipe
+
+    def _duplicate_gallery(self, old_recipe: Recipe, new_recipe: Recipe) -> None:
+        """Gives a duplicated recipe its own gallery rows. The gallery folders were copied along with
+        the rest of the data folder, so they're renamed to the new image ids."""
+        assert old_recipe.id and new_recipe.id
+        gallery_repo = get_repositories(
+            self.repos.session, group_id=self.repos.group_id, household_id=None
+        ).recipe_gallery_images
+
+        for old_image in gallery_repo.multi_query({"recipe_id": old_recipe.id}):
+            new_image = gallery_repo.create(
+                RecipeGalleryImageSave(
+                    recipe_id=new_recipe.id,
+                    group_id=new_recipe.group_id,
+                    position=old_image.position,
+                    caption=old_image.caption,
+                )
+            )
+
+            copied_dir = Recipe.gallery_image_dir_from_id(new_recipe.id, old_image.id)
+            new_dir = Recipe.gallery_image_dir_from_id(new_recipe.id, new_image.id)
+            try:
+                new_dir.rmdir()
+                copied_dir.rename(new_dir)
+            except Exception as e:
+                self.logger.error(f"Failed to copy gallery image {old_image.id} to {new_recipe.slug}: {e}")
 
     def has_recursive_recipe_link(self, recipe: Recipe, path: set[str] | None = None):
         """Recursively checks if a recipe links to itself through its ingredients."""
