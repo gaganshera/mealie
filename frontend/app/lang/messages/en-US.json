@@ -326,7 +326,18 @@
     "meal-plan-settings": "Meal Plan Settings",
     "add-all-to-list": "Add All to List",
     "add-day-to-list": "Add Day to List",
-    "randomize-recipe": "Randomize Recipe"
+    "randomize-recipe": "Randomize Recipe",
+    "subscribe": "Subscribe",
+    "calendar-feed-title": "Subscribe to Meal Plan",
+    "calendar-feed-description": "Add your household's meal plan to Apple, Google or Outlook Calendar with a private subscription link. Anyone with the link can see your meal plan.",
+    "create-subscription-link": "Create subscription link",
+    "calendar-feed-link-shown-once": "Copy this link now. It won't be shown again.",
+    "calendar-feed-webcal-url": "Subscription link (webcal)",
+    "calendar-feed-https-url": "Subscription link (https)",
+    "calendar-feed-created-at": "Created: {0}",
+    "calendar-feed-last-used": "Last used: {0}",
+    "calendar-feed-regenerate": "Regenerate",
+    "calendar-feed-revoke": "Revoke"
   },
   "migration": {
     "new-migration": "New Migration",
