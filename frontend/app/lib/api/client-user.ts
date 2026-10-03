@@ -23,6 +23,7 @@ import { ShoppingApi } from "./user/group-shopping-lists";
 import { MultiPurposeLabelsApi } from "./user/group-multiple-purpose-labels";
 import { GroupEventNotifierApi } from "./user/group-event-notifier";
 import { MealPlanRulesApi } from "./user/group-mealplan-rules";
+import { HouseholdCalendarFeedAPI } from "./user/household-calendar-feed";
 import { GroupDataSeederApi } from "./user/group-seeder";
 import { AIProvidersAPI } from "./user/group-ai-providers";
 import type { ApiRequestInstance } from "~/lib/api/types/non-generated";
@@ -44,6 +45,7 @@ export class UserApiClient {
   public register: RegisterAPI;
   public mealplans: MealPlanAPI;
   public mealplanRules: MealPlanRulesApi;
+  public calendarFeed: HouseholdCalendarFeedAPI;
   public email: EmailAPI;
   public bulk: BulkActionsAPI;
   public groupMigration: GroupMigrationApi;
@@ -75,6 +77,7 @@ export class UserApiClient {
     this.register = new RegisterAPI(requests);
     this.mealplans = new MealPlanAPI(requests);
     this.mealplanRules = new MealPlanRulesApi(requests);
+    this.calendarFeed = new HouseholdCalendarFeedAPI(requests);
 
     // Group
     this.groupMigration = new GroupMigrationApi(requests);

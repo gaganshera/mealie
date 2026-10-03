@@ -326,7 +326,21 @@
     "meal-plan-settings": "Meal Plan Settings",
     "add-all-to-list": "Add All to List",
     "add-day-to-list": "Add Day to List",
-    "randomize-recipe": "Randomize Recipe"
+    "randomize-recipe": "Randomize Recipe",
+    "subscribe": "Subscribe",
+    "calendar-feed-title": "Subscribe to Meal Plan",
+    "calendar-feed-description": "Add your household's meal plan to a calendar app such as Apple, Google or Outlook Calendar. Each meal shows up as an all-day event, from 30 days ago to 90 days ahead.",
+    "calendar-feed-create": "Create subscription link",
+    "calendar-feed-copy-warning": "Copy this link now. It won't be shown again.",
+    "calendar-feed-webcal-url": "Calendar app link",
+    "calendar-feed-https-url": "Web link",
+    "calendar-feed-active": "A subscription link is active.",
+    "calendar-feed-last-used": "Last used: {0}",
+    "calendar-feed-never-used": "Not used yet",
+    "calendar-feed-regenerate": "Regenerate",
+    "calendar-feed-revoke": "Revoke",
+    "calendar-feed-regenerate-hint": "Regenerating or revoking stops the current link from working.",
+    "calendar-feed-revoked": "Subscription link revoked"
   },
   "migration": {
     "new-migration": "New Migration",
