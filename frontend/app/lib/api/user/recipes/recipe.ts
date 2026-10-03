@@ -9,6 +9,9 @@ import type {
   RecipeIn,
   CreateRecipe,
   RecipeAsset,
+  RecipeGalleryImageOut,
+  RecipeGalleryImageUpdate,
+  RecipeGalleryOrder,
   CreateRecipeByUrlBulk,
   ParsedIngredient,
   UpdateImageResponse,
@@ -53,6 +56,11 @@ const routes = {
   recipesRecipeSlugImage: (recipe_slug: string) => `${prefix}/recipes/${recipe_slug}/image`,
   recipesRecipeSlugAssets: (recipe_slug: string) => `${prefix}/recipes/${recipe_slug}/assets`,
   recipesRecipeSlugAssetsUrl: (recipe_slug: string) => `${prefix}/recipes/${recipe_slug}/assets/url`,
+  recipesRecipeSlugGallery: (recipe_slug: string) => `${prefix}/recipes/${recipe_slug}/gallery`,
+  recipesRecipeSlugGalleryOrder: (recipe_slug: string) => `${prefix}/recipes/${recipe_slug}/gallery/order`,
+  recipesRecipeSlugGalleryId: (recipe_slug: string, id: string) => `${prefix}/recipes/${recipe_slug}/gallery/${id}`,
+  recipesRecipeSlugGalleryIdSetCover: (recipe_slug: string, id: string) =>
+    `${prefix}/recipes/${recipe_slug}/gallery/${id}/set-cover`,
 
   recipesSlugComments: (slug: string) => `${prefix}/recipes/${slug}/comments`,
   recipesSlugCommentsId: (slug: string, id: number) => `${prefix}/recipes/${slug}/comments/${id}`,
@@ -152,6 +160,40 @@ export class RecipeAPI extends BaseCRUDAPI<CreateRecipe, Recipe, RecipeIn> {
 
   deleteImage(slug: string) {
     return this.requests.delete<string>(routes.recipesRecipeSlugImage(slug));
+  }
+
+  getGallery(slug: string) {
+    return this.requests.get<RecipeGalleryImageOut[]>(routes.recipesRecipeSlugGallery(slug));
+  }
+
+  addGalleryImage(slug: string, fileObject: File, caption?: string) {
+    const formData = new FormData();
+    formData.append("image", fileObject);
+    formData.append("extension", fileObject.name.split(".").pop() ?? "");
+    if (caption) {
+      formData.append("caption", caption);
+    }
+
+    return this.requests.post<RecipeGalleryImageOut>(routes.recipesRecipeSlugGallery(slug), formData);
+  }
+
+  updateGalleryImage(slug: string, id: string, payload: RecipeGalleryImageUpdate) {
+    return this.requests.patch<RecipeGalleryImageOut, RecipeGalleryImageUpdate>(
+      routes.recipesRecipeSlugGalleryId(slug, id),
+      payload,
+    );
+  }
+
+  reorderGallery(slug: string, ids: string[]) {
+    return this.requests.put<RecipeGalleryImageOut[], RecipeGalleryOrder>(routes.recipesRecipeSlugGalleryOrder(slug), { ids });
+  }
+
+  deleteGalleryImage(slug: string, id: string) {
+    return this.requests.delete(routes.recipesRecipeSlugGalleryId(slug, id));
+  }
+
+  setGalleryImageAsCover(slug: string, id: string) {
+    return this.requests.post<UpdateImageResponse>(routes.recipesRecipeSlugGalleryIdSetCover(slug, id), {});
   }
 
   async testCreateOneUrl(url: string, useOpenAI = false) {

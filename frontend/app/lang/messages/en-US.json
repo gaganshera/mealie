@@ -136,6 +136,7 @@
     "units": "Units",
     "back": "Back",
     "next": "Next",
+    "previous": "Previous",
     "start": "Start",
     "toggle-view": "Toggle View",
     "date": "Date",
@@ -642,6 +643,8 @@
     "upload-more-images": "Upload more images",
     "set-as-cover-image": "Set as recipe cover image",
     "cover-image": "Cover image",
+    "gallery": "Gallery",
+    "gallery-caption": "Caption",
     "include-linked-recipes": "Include Linked Recipes",
     "include-linked-recipe-ingredients": "Include Linked Recipe Ingredients",
     "toggle-recipe": "Toggle Recipe"

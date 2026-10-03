@@ -276,6 +276,10 @@ class Recipe(RecipeSummary):
     def timeline_image_dir_from_id(cls, recipe_id: UUID4 | str, timeline_event_id: UUID4 | str) -> Path:
         return cls._get_dir(cls.image_dir_from_id(recipe_id).joinpath("timeline").joinpath(str(timeline_event_id)))
 
+    @classmethod
+    def gallery_image_dir_from_id(cls, recipe_id: UUID4 | str, image_id: UUID4 | str) -> Path:
+        return cls._get_dir(cls.image_dir_from_id(recipe_id).joinpath("gallery").joinpath(str(image_id)))
+
     @property
     def directory(self) -> Path:
         if not self.id:

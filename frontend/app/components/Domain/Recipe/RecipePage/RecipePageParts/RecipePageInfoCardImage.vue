@@ -16,8 +16,8 @@
   <RecipeImageLightbox
     v-if="lightboxOpen"
     v-model="lightboxOpen"
-    :image-url="recipeFullImageUrl"
-    :image-alt="recipe.name"
+    v-model:index="lightboxIndex"
+    :images="lightboxImages"
   />
 </template>
 
@@ -25,6 +25,7 @@
 import { useStaticRoutes, useUserApi } from "~/composables/api";
 import type { HouseholdSummary } from "~/lib/api/types/household";
 import { usePageState, usePageUser } from "~/composables/recipe-page/shared-state";
+import { useRecipeGallery } from "~/composables/recipes/use-recipe-gallery";
 import type { Recipe } from "~/lib/api/types/recipe";
 import type { NoUndefinedField } from "~/lib/api/types/non-generated";
 
@@ -37,7 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const display = useDisplay();
-const { recipeImage, recipeSmallImage } = useStaticRoutes();
+const { recipeImage, recipeSmallImage, recipeGalleryImage } = useStaticRoutes();
 const { imageKey } = usePageState(props.recipe.slug);
 const { user } = usePageUser();
 
@@ -51,11 +52,24 @@ if (user) {
 
 const hideImage = ref(false);
 const lightboxOpen = ref(false);
+const lightboxIndex = ref(0);
+const { images: galleryImages } = useRecipeGallery(props.recipe.slug);
+
+// The cover image comes first, followed by the gallery
+const lightboxImages = computed(() => [
+  { url: recipeFullImageUrl.value, alt: props.recipe.name },
+  ...galleryImages.value.map(image => ({
+    url: recipeGalleryImage(props.recipe.id, image.id),
+    alt: image.caption || props.recipe.name,
+    caption: image.caption,
+  })),
+]);
 
 function openLightbox() {
   if (hideImage.value) {
     return;
   }
+  lightboxIndex.value = 0;
   lightboxOpen.value = true;
 }
 
