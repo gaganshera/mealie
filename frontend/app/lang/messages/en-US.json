@@ -136,6 +136,7 @@
     "units": "Units",
     "back": "Back",
     "next": "Next",
+    "previous": "Previous",
     "start": "Start",
     "toggle-view": "Toggle View",
     "date": "Date",
@@ -644,7 +645,10 @@
     "cover-image": "Cover image",
     "include-linked-recipes": "Include Linked Recipes",
     "include-linked-recipe-ingredients": "Include Linked Recipe Ingredients",
-    "toggle-recipe": "Toggle Recipe"
+    "toggle-recipe": "Toggle Recipe",
+    "gallery": "Gallery",
+    "gallery-caption": "Caption",
+    "gallery-upload-failed": "Could not upload {0}"
   },
   "recipe-finder": {
     "recipe-finder": "Recipe Finder",

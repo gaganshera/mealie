@@ -12,9 +12,10 @@
     >
       <div ref="frameRef" class="lightbox-frame">
         <img
-          v-if="imageUrl"
-          :src="imageUrl"
-          :alt="imageAlt"
+          v-if="currentUrl"
+          :key="currentUrl"
+          :src="currentUrl"
+          :alt="currentAlt"
           class="lightbox-img"
           draggable="false"
           :style="imgStyle"
@@ -25,6 +26,40 @@
           @pointerup="onPointerUp"
           @pointercancel="onPointerUp"
         >
+      </div>
+      <template v-if="total > 1">
+        <v-btn
+          icon
+          variant="text"
+          class="lightbox-prev"
+          :disabled="index <= 0"
+          :aria-label="$t('general.previous')"
+          @click.stop="go(-1)"
+        >
+          <v-icon>{{ $globals.icons.chevronLeft }}</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          variant="text"
+          class="lightbox-next"
+          :disabled="index >= total - 1"
+          :aria-label="$t('general.next')"
+          @click.stop="go(1)"
+        >
+          <v-icon>{{ $globals.icons.chevronRight }}</v-icon>
+        </v-btn>
+      </template>
+      <div
+        v-if="total > 1 || currentCaption"
+        class="lightbox-footer text-center"
+        @click.stop
+      >
+        <div v-if="currentCaption" class="lightbox-caption">
+          {{ currentCaption }}
+        </div>
+        <div v-if="total > 1" class="lightbox-counter text-caption">
+          {{ index + 1 }} / {{ total }}
+        </div>
       </div>
       <v-btn
         icon
@@ -42,13 +77,50 @@
 <script setup lang="ts">
 import { useTheme } from "vuetify";
 
+interface LightboxImage {
+  url: string;
+  alt?: string;
+  caption?: string | null;
+}
+
 interface Props {
   imageUrl?: string;
   imageAlt?: string;
+  images?: LightboxImage[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const model = defineModel<boolean>({ required: true });
+const index = defineModel<number>("index", { default: 0 });
+
+// A single `imageUrl` is shown when no `images` list is given
+const total = computed(() => props.images?.length ?? 0);
+const current = computed<LightboxImage | undefined>(() =>
+  total.value ? props.images![Math.min(Math.max(index.value, 0), total.value - 1)] : undefined,
+);
+const currentUrl = computed(() => (current.value ? current.value.url : props.imageUrl));
+const currentAlt = computed(() => (current.value ? current.value.alt : props.imageAlt));
+const currentCaption = computed(() => current.value?.caption);
+
+function go(step: number) {
+  const next = index.value + step;
+  if (next < 0 || next >= total.value) {
+    return;
+  }
+  index.value = next;
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (!model.value) {
+    return;
+  }
+  if (event.key === "ArrowLeft") {
+    go(-1);
+  }
+  else if (event.key === "ArrowRight") {
+    go(1);
+  }
+}
 
 const theme = useTheme();
 const isDark = computed(() => theme.global.current.value.dark);
@@ -87,10 +159,12 @@ function onImageLoad(event: Event) {
 onMounted(() => {
   updateFrameSize();
   window.addEventListener("resize", updateFrameSize);
+  window.addEventListener("keydown", onKeydown);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateFrameSize);
+  window.removeEventListener("keydown", onKeydown);
 });
 
 const renderedSize = computed(() => {
@@ -136,6 +210,11 @@ watch(model, (open) => {
   }
 });
 
+watch(index, resetZoom);
+
+const SWIPE_DISTANCE = 50;
+let swipeStartX: number | null = null;
+
 function onBackgroundClick() {
   model.value = false;
 }
@@ -157,6 +236,7 @@ function onImageClick(event: MouseEvent) {
 function onPointerDown(event: PointerEvent) {
   event.stopPropagation();
   if (!zoomed.value) {
+    swipeStartX = event.clientX;
     return;
   }
   dragging.value = true;
@@ -180,6 +260,16 @@ function onPointerMove(event: PointerEvent) {
 function onPointerUp(event: PointerEvent) {
   event.stopPropagation();
   dragging.value = false;
+
+  if (swipeStartX !== null) {
+    const dx = event.clientX - swipeStartX;
+    swipeStartX = null;
+    if (Math.abs(dx) > SWIPE_DISTANCE) {
+      // a swipe is not a click: don't zoom in afterwards
+      dragMoved.value = true;
+      go(dx < 0 ? 1 : -1);
+    }
+  }
 }
 
 const imgStyle = computed(() => ({
@@ -210,6 +300,30 @@ const imgStyle = computed(() => ({
   position: absolute;
   top: 12px;
   right: 12px;
+}
+
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-prev {
+  left: 12px;
+}
+
+.lightbox-next {
+  right: 12px;
+}
+
+.lightbox-footer {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80vw;
+  cursor: default;
 }
 
 .lightbox-frame {

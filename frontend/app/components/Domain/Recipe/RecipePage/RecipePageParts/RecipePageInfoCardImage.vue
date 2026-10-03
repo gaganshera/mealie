@@ -16,8 +16,8 @@
   <RecipeImageLightbox
     v-if="lightboxOpen"
     v-model="lightboxOpen"
-    :image-url="recipeFullImageUrl"
-    :image-alt="recipe.name"
+    v-model:index="lightboxIndex"
+    :images="lightboxImages(recipe.id, recipe.name, recipeFullImageUrl)"
   />
 </template>
 
@@ -25,6 +25,7 @@
 import { useStaticRoutes, useUserApi } from "~/composables/api";
 import type { HouseholdSummary } from "~/lib/api/types/household";
 import { usePageState, usePageUser } from "~/composables/recipe-page/shared-state";
+import { useRecipeGallery } from "~/composables/recipes/use-recipe-gallery";
 import type { Recipe } from "~/lib/api/types/recipe";
 import type { NoUndefinedField } from "~/lib/api/types/non-generated";
 
@@ -49,13 +50,18 @@ if (user) {
   });
 }
 
+const { lightboxImages } = useRecipeGallery(props.recipe.slug);
+
 const hideImage = ref(false);
 const lightboxOpen = ref(false);
+const lightboxIndex = ref(0);
 
 function openLightbox() {
   if (hideImage.value) {
     return;
   }
+  // the cover comes first, followed by the gallery images
+  lightboxIndex.value = 0;
   lightboxOpen.value = true;
 }
 

@@ -515,7 +515,25 @@ class RecipeService(RecipeServiceBase):
         except Exception as e:
             self.logger.error(f"Failed to copy assets from {old_recipe.slug} to {new_recipe.slug}: {e}")
 
+        self._duplicate_gallery(old_recipe, new_recipe)
         return new_recipe
+
+    def _duplicate_gallery(self, old_recipe: Recipe, new_recipe: Recipe) -> None:
+        """Gives the copy its own gallery rows, renaming the copied gallery folders to the new ids"""
+        gallery_repo = self.repos.recipe_gallery_images
+        gallery_dir = new_recipe.image_dir.joinpath("gallery")
+        for image in gallery_repo.multi_query({"recipe_id": old_recipe.id}):
+            new_image = gallery_repo.create(
+                {
+                    "recipe_id": new_recipe.id,
+                    "group_id": new_recipe.group_id,
+                    "position": image.position,
+                    "caption": image.caption,
+                }
+            )
+            copied_dir = gallery_dir.joinpath(str(image.id))
+            if copied_dir.exists():
+                copied_dir.rename(gallery_dir.joinpath(str(new_image.id)))
 
     def has_recursive_recipe_link(self, recipe: Recipe, path: set[str] | None = None):
         """Recursively checks if a recipe links to itself through its ingredients."""

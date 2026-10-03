@@ -53,6 +53,7 @@
           <div>
             <RecipePageInfoEditor v-if="isEditMode" v-model="recipe" />
           </div>
+          <RecipeGallery v-if="!isCookMode" v-model="recipe" :edit="isEditForm" />
           <div>
             <RecipePageEditorToolbar v-if="isEditForm" v-model="recipe" />
           </div>
@@ -249,6 +250,7 @@ import { useUserApi } from "~/composables/api";
 import { uuid4, deepCopy } from "~/composables/use-utils";
 import RecipeDialogBulkAdd from "~/components/Domain/Recipe/RecipeDialogBulkAdd.vue";
 import RecipeNotes from "~/components/Domain/Recipe/RecipeNotes.vue";
+import RecipeGallery from "~/components/Domain/Recipe/RecipeGallery.vue";
 import { useLoggedInState } from "~/composables/use-logged-in-state";
 import { useNavigationWarning } from "~/composables/use-navigation-warning";
 import { useUnitConversion, useUnitSystem } from "~/composables/recipes";
