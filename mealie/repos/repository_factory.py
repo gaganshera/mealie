@@ -10,6 +10,7 @@ from mealie.db.models.group import Group, ReportEntryModel, ReportModel
 from mealie.db.models.group.ai_providers import AIProvider, AIProviderSettings
 from mealie.db.models.group.exports import GroupDataExportsModel
 from mealie.db.models.group.preferences import GroupPreferencesModel
+from mealie.db.models.household.calendar_feed import MealPlanCalendarFeedToken
 from mealie.db.models.household.cookbook import CookBook
 from mealie.db.models.household.events import GroupEventNotifierModel
 from mealie.db.models.household.household import Household
@@ -62,6 +63,7 @@ from mealie.schema.household.household_preferences import ReadHouseholdPreferenc
 from mealie.schema.household.invite_token import ReadInviteToken
 from mealie.schema.household.webhook import ReadWebhook
 from mealie.schema.labels import MultiPurposeLabelOut
+from mealie.schema.meal_plan.calendar_feed import CalendarFeedTokenInDB
 from mealie.schema.meal_plan.new_meal import ReadPlanEntry
 from mealie.schema.meal_plan.plan_rules import PlanRulesOut
 from mealie.schema.recipe import Recipe, RecipeCommentOut, RecipeToolOut
@@ -256,6 +258,12 @@ class AllRepositories:
     @cached_property
     def api_tokens(self) -> GroupRepositoryGeneric[LongLiveTokenInDB, LongLiveToken]:
         return GroupRepositoryGeneric(self.session, PK_ID, LongLiveToken, LongLiveTokenInDB, group_id=self.group_id)
+
+    @cached_property
+    def calendar_feed_tokens(self) -> GroupRepositoryGeneric[CalendarFeedTokenInDB, MealPlanCalendarFeedToken]:
+        return GroupRepositoryGeneric(
+            self.session, PK_ID, MealPlanCalendarFeedToken, CalendarFeedTokenInDB, group_id=self.group_id
+        )
 
     @cached_property
     def tokens_pw_reset(self) -> GroupRepositoryGeneric[PrivatePasswordResetToken, PasswordResetModel]:

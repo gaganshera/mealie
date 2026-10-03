@@ -6,6 +6,7 @@
       :recipes="weekRecipesWithScales"
       :shopping-lists="shoppingLists"
     />
+    <HouseholdMealPlanCalendarFeedDialog v-model="calendarFeedDialog" />
     <div :class="`d-flex ga-2 ${$vuetify.display.xs ? 'justify-center' : 'justify-start'}`">
       <v-btn :icon="$globals.icons.chevronLeft" flat rounded="md" density="comfortable" @click="() => changeWeek(-1)" />
       <v-menu
@@ -76,6 +77,11 @@
             event: 'edit',
           },
           {
+            icon: $globals.icons.calendar,
+            text: $t('meal-plan.subscribe'),
+            event: 'subscribe',
+          },
+          {
             icon: $globals.icons.dotsVertical,
             text: '',
             event: 'three-dot',
@@ -98,6 +104,7 @@
         @edit="router.push({ name: TABS.edit, query: route.query })"
         @view="router.push({ name: TABS.view, query: route.query })"
         @settings="router.push('/household/mealplan/settings')"
+        @subscribe="calendarFeedDialog = true"
       />
     </div>
     <div>
@@ -113,6 +120,7 @@
 
 <script setup lang="ts">
 import { addDays, differenceInCalendarDays, format, isSameDay, isValid, parseISO } from "date-fns";
+import HouseholdMealPlanCalendarFeedDialog from "~/components/Domain/Household/HouseholdMealPlanCalendarFeedDialog.vue";
 import RecipeDialogAddToShoppingList from "~/components/Domain/Recipe/RecipeDialogAddToShoppingList.vue";
 import { useAddToShoppingListDialog } from "~/composables/shopping-list-page/use-add-to-shopping-list-dialog";
 import { useMealplans } from "~/composables/use-group-mealplan";
@@ -133,6 +141,7 @@ const router = useRouter();
 const i18n = useI18n();
 const { household, actions: householdActions } = useHouseholdSelf();
 const { shoppingLists, open: shoppingListDialog, addAllToList } = useAddToShoppingListDialog();
+const calendarFeedDialog = ref(false);
 
 useSeoMeta({
   title: i18n.t("meal-plan.dinner-this-week"),

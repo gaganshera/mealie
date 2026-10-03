@@ -1,3 +1,4 @@
+from .calendar_feed import MealPlanCalendarFeedToken
 from .cookbook import CookBook
 from .events import GroupEventNotifierModel, GroupEventNotifierOptionsModel
 from .household import Household
@@ -24,6 +25,7 @@ __all__ = [
     "GroupMealPlan",
     "GroupMealPlanRules",
     "Household",
+    "MealPlanCalendarFeedToken",
     "HouseholdPreferencesModel",
     "HouseholdToRecipe",
     "GroupRecipeAction",
