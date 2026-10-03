@@ -28,6 +28,7 @@ from mealie.db.models.household.shopping_list import (
 from mealie.db.models.household.webhooks import GroupWebhooksModel
 from mealie.db.models.recipe.category import Category, recipes_to_categories
 from mealie.db.models.recipe.comment import RecipeComment
+from mealie.db.models.recipe.gallery import RecipeGalleryImage
 from mealie.db.models.recipe.ingredient import IngredientFoodModel, IngredientUnitModel
 from mealie.db.models.recipe.labels import MultiPurposeLabel
 from mealie.db.models.recipe.recipe import RecipeModel
@@ -66,6 +67,7 @@ from mealie.schema.meal_plan.new_meal import ReadPlanEntry
 from mealie.schema.meal_plan.plan_rules import PlanRulesOut
 from mealie.schema.recipe import Recipe, RecipeCommentOut, RecipeToolOut
 from mealie.schema.recipe.recipe_category import CategoryOut, TagOut
+from mealie.schema.recipe.recipe_gallery import RecipeGalleryImageOut
 from mealie.schema.recipe.recipe_ingredient import IngredientFood, IngredientUnit
 from mealie.schema.recipe.recipe_share_token import RecipeShareToken
 from mealie.schema.recipe.recipe_timeline_events import RecipeTimelineEventOut
@@ -240,6 +242,12 @@ class AllRepositories:
         # this is a group repository, rather than a household repository.
         return GroupRepositoryGeneric(
             self.session, PK_ID, RecipeTimelineEvent, RecipeTimelineEventOut, group_id=self.group_id
+        )
+
+    @cached_property
+    def recipe_gallery_images(self) -> GroupRepositoryGeneric[RecipeGalleryImageOut, RecipeGalleryImage]:
+        return GroupRepositoryGeneric(
+            self.session, PK_ID, RecipeGalleryImage, RecipeGalleryImageOut, group_id=self.group_id
         )
 
     # ================================================================

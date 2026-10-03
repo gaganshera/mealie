@@ -2,6 +2,7 @@ from .api_extras import *
 from .assets import *
 from .category import *
 from .comment import *
+from .gallery import *
 from .ingredient import *
 from .instruction import *
 from .note import *

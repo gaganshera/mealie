@@ -48,6 +48,20 @@ async def get_recipe_timeline_event_img(
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
 
+@router.get("/{recipe_id}/images/gallery/{image_id}/{file_name}")
+async def get_recipe_gallery_img(recipe_id: UUID4, image_id: UUID4, file_name: ImageType = ImageType.original):
+    """
+    Takes in a recipe id and gallery image id, returns the static image. This route is proxied in the docker image
+    and should not hit the API in production
+    """
+    gallery_image = Recipe.gallery_image_dir_from_id(recipe_id, image_id).joinpath(file_name.value)
+
+    if gallery_image.exists():
+        return FileResponse(gallery_image, media_type="image/webp")
+    else:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+
 @router.get("/{recipe_id}/assets/{file_name}")
 async def get_recipe_asset(recipe_id: UUID4, file_name: str):
     """Returns a recipe asset"""

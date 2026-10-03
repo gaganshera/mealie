@@ -402,6 +402,29 @@ export interface RecipeCommentUpdate {
 export interface RecipeDuplicate {
   name?: string | null;
 }
+export interface RecipeGalleryImageCreate {
+  caption?: string | null;
+}
+export interface RecipeGalleryImageOut {
+  id: string;
+  recipeId: string;
+  position: number;
+  caption?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface RecipeGalleryImageSave {
+  caption?: string | null;
+  recipeId: string;
+  groupId: string;
+  position: number;
+}
+export interface RecipeGalleryImageUpdate {
+  caption?: string | null;
+}
+export interface RecipeGalleryOrder {
+  imageIds: string[];
+}
 export interface RecipeIn {
   id?: string | null;
   userId?: string;

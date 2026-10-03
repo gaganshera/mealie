@@ -32,6 +32,7 @@
           @delete="deleteRecipe"
           @close="closeEditor"
         />
+        <RecipeGallery v-if="!isEditJSON" v-model="recipe" />
         <RecipeJsonEditor
           v-if="isEditJSON"
           v-model="recipe"
@@ -227,6 +228,7 @@ import RecipeIngredients from "../RecipeIngredients.vue";
 import RecipePageEditorToolbar from "./RecipePageParts/RecipePageEditorToolbar.vue";
 import RecipePageFooter from "./RecipePageParts/RecipePageFooter.vue";
 import RecipePageHeader from "./RecipePageParts/RecipePageHeader.vue";
+import RecipeGallery from "~/components/Domain/Recipe/RecipeGallery.vue";
 import RecipePageIngredientEditor from "./RecipePageParts/RecipePageIngredientEditor.vue";
 import RecipePageIngredientToolsView from "./RecipePageParts/RecipePageIngredientToolsView.vue";
 import RecipePageInstructions from "./RecipePageParts/RecipePageInstructions.vue";

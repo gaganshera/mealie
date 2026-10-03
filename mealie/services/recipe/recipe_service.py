@@ -22,6 +22,7 @@ from mealie.repos.repository_generic import RepositoryGeneric
 from mealie.schema import mapper
 from mealie.schema.household.household import HouseholdInDB, HouseholdRecipeUpdate
 from mealie.schema.recipe.recipe import CreateRecipe, Recipe, create_recipe_slug
+from mealie.schema.recipe.recipe_gallery import RecipeGalleryImageSave
 from mealie.schema.recipe.recipe_ingredient import (
     CreateIngredientFood,
     CreateIngredientUnit,
@@ -515,7 +516,27 @@ class RecipeService(RecipeServiceBase):
         except Exception as e:
             self.logger.error(f"Failed to copy assets from {old_recipe.slug} to {new_recipe.slug}: {e}")
 
+        self._duplicate_gallery(old_recipe, new_recipe)
         return new_recipe
+
+    def _duplicate_gallery(self, old_recipe: Recipe, new_recipe: Recipe) -> None:
+        """Gives the copy its own gallery rows, renaming the gallery folders copied with the recipe data to match"""
+        old_images = self.repos.recipe_gallery_images.multi_query({"recipe_id": old_recipe.id})
+        for old_image in old_images:
+            new_image = self.repos.recipe_gallery_images.create(
+                RecipeGalleryImageSave(
+                    recipe_id=new_recipe.id,
+                    group_id=new_recipe.group_id,
+                    position=old_image.position,
+                    caption=old_image.caption,
+                )
+            )
+
+            copied_dir = Recipe.image_dir_from_id(new_recipe.id).joinpath("gallery", str(old_image.id))
+            if copied_dir.is_dir():
+                new_dir = new_image.image_dir
+                new_dir.rmdir()
+                copied_dir.rename(new_dir)
 
     def has_recursive_recipe_link(self, recipe: Recipe, path: set[str] | None = None):
         """Recursively checks if a recipe links to itself through its ingredients."""

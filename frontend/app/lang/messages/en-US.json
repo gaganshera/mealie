@@ -644,7 +644,14 @@
     "cover-image": "Cover image",
     "include-linked-recipes": "Include Linked Recipes",
     "include-linked-recipe-ingredients": "Include Linked Recipe Ingredients",
-    "toggle-recipe": "Toggle Recipe"
+    "toggle-recipe": "Toggle Recipe",
+    "gallery": "Photos",
+    "gallery-caption": "Caption",
+    "gallery-drag-to-reorder": "Drag to reorder",
+    "gallery-cover-updated": "Cover image updated",
+    "lightbox-previous-image": "Previous image",
+    "lightbox-next-image": "Next image",
+    "lightbox-counter": "{current} / {total}"
   },
   "recipe-finder": {
     "recipe-finder": "Recipe Finder",
