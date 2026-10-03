@@ -85,6 +85,8 @@ groups_self = "/api/groups/self"
 """`/api/groups/self`"""
 groups_storage = "/api/groups/storage"
 """`/api/groups/storage`"""
+households_calendar_feed = "/api/households/calendar-feed"
+"""`/api/households/calendar-feed`"""
 households_cookbooks = "/api/households/cookbooks"
 """`/api/households/cookbooks`"""
 households_events_notifications = "/api/households/events/notifications"
@@ -360,6 +362,11 @@ def groups_members_username_or_id(username_or_id):
 def groups_reports_item_id(item_id):
     """`/api/groups/reports/{item_id}`"""
     return f"{prefix}/groups/reports/{item_id}"
+
+
+def households_calendar_feed_token_ics(token):
+    """`/api/households/calendar-feed/{token}.ics`"""
+    return f"{prefix}/households/calendar-feed/{token}.ics"
 
 
 def households_cookbooks_item_id(item_id):
