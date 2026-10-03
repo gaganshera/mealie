@@ -12,6 +12,26 @@ export type LogicalOperator = "AND" | "OR";
 export type RelationalKeyword = "IS" | "IS NOT" | "IN" | "NOT IN" | "CONTAINS ALL" | "LIKE" | "NOT LIKE";
 export type RelationalOperator = "=" | "<>" | ">" | "<" | ">=" | "<=";
 
+export interface CalendarFeedCreated {
+  url: string;
+  webcalUrl: string;
+}
+export interface CalendarFeedStatus {
+  enabled?: boolean;
+  createdAt?: string | null;
+  lastAccessedAt?: string | null;
+}
+export interface CalendarFeedTokenInDB {
+  userId: string;
+  tokenHash: string;
+  id: string;
+  createdAt?: string | null;
+  lastAccessedAt?: string | null;
+}
+export interface CalendarFeedTokenSave {
+  userId: string;
+  tokenHash: string;
+}
 export interface CreatePlanEntry {
   date: string;
   entryType?: PlanEntryType;
