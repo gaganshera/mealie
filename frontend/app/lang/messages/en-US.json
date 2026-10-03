@@ -644,7 +644,20 @@
     "cover-image": "Cover image",
     "include-linked-recipes": "Include Linked Recipes",
     "include-linked-recipe-ingredients": "Include Linked Recipe Ingredients",
-    "toggle-recipe": "Toggle Recipe"
+    "toggle-recipe": "Toggle Recipe",
+    "gallery": {
+      "title": "Photo Gallery",
+      "add-images": "Add Images",
+      "caption": "Caption",
+      "set-as-cover": "Set as Cover",
+      "cover-updated": "Cover image updated",
+      "delete-image": "Delete Image",
+      "drag-to-reorder": "Drag to reorder",
+      "open-image": "Open image {number}",
+      "previous-image": "Previous image",
+      "next-image": "Next image",
+      "upload-failed": "Couldn't upload {name}"
+    }
   },
   "recipe-finder": {
     "recipe-finder": "Recipe Finder",

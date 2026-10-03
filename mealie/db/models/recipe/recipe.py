@@ -23,6 +23,7 @@ from .api_extras import ApiExtras, api_extras
 from .assets import RecipeAsset
 from .category import recipes_to_categories
 from .comment import RecipeComment
+from .gallery import RecipeGalleryImage
 from .instruction import RecipeInstruction
 from .note import Note
 from .nutrition import Nutrition
@@ -133,6 +134,13 @@ class RecipeModel(SqlAlchemyBase, BaseMixins):
         "RecipeTimelineEvent", back_populates="recipe", cascade="all, delete, delete-orphan"
     )
 
+    gallery_images: Mapped[list[RecipeGalleryImage]] = orm.relationship(
+        "RecipeGalleryImage",
+        back_populates="recipe",
+        cascade="all, delete, delete-orphan",
+        order_by="RecipeGalleryImage.position",
+    )
+
     # Mealie Specific
     settings: Mapped[list[RecipeSettings]] = orm.relationship(
         "RecipeSettings", uselist=False, cascade="all, delete-orphan"
@@ -177,6 +185,7 @@ class RecipeModel(SqlAlchemyBase, BaseMixins):
             "settings",
             "comments",
             "timeline_events",
+            "gallery_images",
         },
     )
 

@@ -454,6 +454,30 @@ export interface RecipeToolIn {
   recipeCount?: number;
   householdsWithTool?: string[];
 }
+export interface RecipeGalleryImageCreate {
+  caption?: string | null;
+}
+export interface RecipeGalleryImageOut {
+  id: string;
+  recipeId: string;
+  position: number;
+  caption?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+export interface RecipeGalleryImageSave {
+  caption?: string | null;
+  id: string;
+  groupId: string;
+  recipeId: string;
+  position: number;
+}
+export interface RecipeGalleryImageUpdate {
+  caption?: string | null;
+}
+export interface RecipeGalleryOrder {
+  ids: string[];
+}
 export interface RecipeIngredientBase {
   quantity?: number | null;
   unit?: IngredientUnit | CreateIngredientUnit | null;

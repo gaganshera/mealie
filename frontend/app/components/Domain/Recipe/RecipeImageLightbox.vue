@@ -12,9 +12,10 @@
     >
       <div ref="frameRef" class="lightbox-frame">
         <img
-          v-if="imageUrl"
-          :src="imageUrl"
-          :alt="imageAlt"
+          v-if="current.url"
+          :key="current.url"
+          :src="current.url"
+          :alt="current.alt"
           class="lightbox-img"
           draggable="false"
           :style="imgStyle"
@@ -25,6 +26,40 @@
           @pointerup="onPointerUp"
           @pointercancel="onPointerUp"
         >
+      </div>
+      <template v-if="hasMultiple">
+        <v-btn
+          icon
+          variant="text"
+          class="lightbox-prev"
+          :disabled="!canGoPrev"
+          :aria-label="$t('recipe.gallery.previous-image')"
+          @click.stop="goTo(index - 1)"
+        >
+          <v-icon>{{ $globals.icons.chevronLeft }}</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          variant="text"
+          class="lightbox-next"
+          :disabled="!canGoNext"
+          :aria-label="$t('recipe.gallery.next-image')"
+          @click.stop="goTo(index + 1)"
+        >
+          <v-icon>{{ $globals.icons.chevronRight }}</v-icon>
+        </v-btn>
+      </template>
+      <div
+        v-if="hasMultiple || current.caption"
+        class="lightbox-footer"
+        @click.stop
+      >
+        <div v-if="current.caption" class="lightbox-caption">
+          {{ current.caption }}
+        </div>
+        <div v-if="hasMultiple" class="lightbox-counter">
+          {{ index + 1 }} / {{ images!.length }}
+        </div>
       </div>
       <v-btn
         icon
@@ -41,14 +76,53 @@
 
 <script setup lang="ts">
 import { useTheme } from "vuetify";
+import type { LightboxImage } from "~/composables/recipes/use-recipe-gallery";
 
 interface Props {
   imageUrl?: string;
   imageAlt?: string;
+  /** When given, the lightbox browses these images instead of showing `imageUrl` */
+  images?: LightboxImage[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const model = defineModel<boolean>({ required: true });
+const index = defineModel<number>("index", { default: 0 });
+
+const hasMultiple = computed(() => (props.images?.length ?? 0) > 1);
+const canGoPrev = computed(() => index.value > 0);
+const canGoNext = computed(() => index.value < (props.images?.length ?? 1) - 1);
+
+const current = computed<LightboxImage>(() => {
+  if (props.images?.length) {
+    return props.images[Math.min(Math.max(index.value, 0), props.images.length - 1)]!;
+  }
+  return { url: props.imageUrl ?? "", alt: props.imageAlt };
+});
+
+function goTo(newIndex: number) {
+  const count = props.images?.length ?? 0;
+  if (newIndex < 0 || newIndex >= count) {
+    return;
+  }
+  index.value = newIndex;
+}
+
+watch(index, () => {
+  resetZoom();
+});
+
+function onKeydown(event: KeyboardEvent) {
+  if (!model.value || !hasMultiple.value) {
+    return;
+  }
+  if (event.key === "ArrowLeft") {
+    goTo(index.value - 1);
+  }
+  else if (event.key === "ArrowRight") {
+    goTo(index.value + 1);
+  }
+}
 
 const theme = useTheme();
 const isDark = computed(() => theme.global.current.value.dark);
@@ -87,10 +161,12 @@ function onImageLoad(event: Event) {
 onMounted(() => {
   updateFrameSize();
   window.addEventListener("resize", updateFrameSize);
+  window.addEventListener("keydown", onKeydown);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateFrameSize);
+  window.removeEventListener("keydown", onKeydown);
 });
 
 const renderedSize = computed(() => {
@@ -109,6 +185,10 @@ const pan = reactive({ x: 0, y: 0 });
 const dragging = ref(false);
 const dragMoved = ref(false);
 let dragStart = { x: 0, y: 0, panX: 0, panY: 0 };
+
+// A horizontal swipe on the (unzoomed) image moves to the previous/next image
+const SWIPE_THRESHOLD = 50;
+let swipeStart: { x: number; y: number } | null = null;
 
 // Keep the zoomed image overlapping its frame: at most half the overhang in each
 // direction, so it can never be dragged completely out of view.
@@ -157,6 +237,7 @@ function onImageClick(event: MouseEvent) {
 function onPointerDown(event: PointerEvent) {
   event.stopPropagation();
   if (!zoomed.value) {
+    swipeStart = hasMultiple.value ? { x: event.clientX, y: event.clientY } : null;
     return;
   }
   dragging.value = true;
@@ -180,6 +261,17 @@ function onPointerMove(event: PointerEvent) {
 function onPointerUp(event: PointerEvent) {
   event.stopPropagation();
   dragging.value = false;
+
+  if (swipeStart && !zoomed.value) {
+    const dx = event.clientX - swipeStart.x;
+    const dy = event.clientY - swipeStart.y;
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      // Swallow the click that follows the swipe so it doesn't zoom the next image
+      dragMoved.value = true;
+      goTo(index.value + (dx < 0 ? 1 : -1));
+    }
+  }
+  swipeStart = null;
 }
 
 const imgStyle = computed(() => ({
@@ -210,6 +302,40 @@ const imgStyle = computed(() => ({
   position: absolute;
   top: 12px;
   right: 12px;
+}
+
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-prev {
+  left: 12px;
+}
+
+.lightbox-next {
+  right: 12px;
+}
+
+.lightbox-footer {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80vw;
+  text-align: center;
+  cursor: default;
+}
+
+.lightbox-caption {
+  font-size: 1rem;
+}
+
+.lightbox-counter {
+  font-size: 0.875rem;
+  opacity: 0.8;
 }
 
 .lightbox-frame {

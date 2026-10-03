@@ -22,6 +22,7 @@ from mealie.repos.repository_generic import RepositoryGeneric
 from mealie.schema import mapper
 from mealie.schema.household.household import HouseholdInDB, HouseholdRecipeUpdate
 from mealie.schema.recipe.recipe import CreateRecipe, Recipe, create_recipe_slug
+from mealie.schema.recipe.recipe_gallery import RecipeGalleryImageSave
 from mealie.schema.recipe.recipe_ingredient import (
     CreateIngredientFood,
     CreateIngredientUnit,
@@ -515,7 +516,35 @@ class RecipeService(RecipeServiceBase):
         except Exception as e:
             self.logger.error(f"Failed to copy assets from {old_recipe.slug} to {new_recipe.slug}: {e}")
 
+        self._duplicate_gallery(old_recipe, new_recipe)
         return new_recipe
+
+    def _duplicate_gallery(self, old_recipe: Recipe, new_recipe: Recipe) -> None:
+        """Gives a duplicated recipe its own gallery rows, renaming the copied image folders to the new ids"""
+        old_images = self.repos.recipe_gallery_images.multi_query({"recipe_id": old_recipe.id})
+        gallery_dir = Recipe.image_dir_from_id(new_recipe.id).joinpath("gallery")
+
+        new_images: list[RecipeGalleryImageSave] = []
+        for image in old_images:
+            copied_dir = gallery_dir.joinpath(str(image.id))
+            if not copied_dir.is_dir():
+                self.logger.error(f"Gallery image {image.id} was not copied to {new_recipe.slug}; skipping it")
+                continue
+
+            new_id = uuid4()
+            copied_dir.rename(gallery_dir.joinpath(str(new_id)))
+            new_images.append(
+                RecipeGalleryImageSave(
+                    id=new_id,
+                    group_id=new_recipe.group_id,
+                    recipe_id=new_recipe.id,
+                    position=image.position,
+                    caption=image.caption,
+                )
+            )
+
+        if new_images:
+            self.repos.recipe_gallery_images.create_many(new_images)
 
     def has_recursive_recipe_link(self, recipe: Recipe, path: set[str] | None = None):
         """Recursively checks if a recipe links to itself through its ingredients."""
